@@ -14,6 +14,11 @@ function App() {
   const [currentNumber, updateCurrentNumber] = useState<number>(0)
 
   function onNextNumberClick(){
+    if(candidateNumbers.length === 0){
+      alert('もう数字がないよ。リセットしてね！')
+      return
+    }
+      
     const index = getRandomNumber(0, candidateNumbers.length-1)
     const number = candidateNumbers[index]
     updateCurrentNumber(number)
