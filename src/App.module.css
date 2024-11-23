@@ -1,0 +1,35 @@
+.button{
+    width:100vw;
+    height:50px;
+    font-size:30px;
+}
+
+.numberContainer{
+    flex-grow: 1;
+    height: calc(100vh - 110px);
+
+    .currentNumber{
+        margin:10px;
+        border:10px double pink;
+        border-radius: 30px;
+        padding: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 150px;
+        height:150px;
+    }
+    
+    .chosenNumbers{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-y:scroll;
+        height:calc(100% - 200px);
+    
+        & > div{
+            margin:3px;
+            font-size: 75px;
+        }
+    }
+}
