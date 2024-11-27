@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './App.module.css'
 import { useImmer } from 'use-immer'
+import clsx from 'clsx';
 
 const initialCandidateNumbers = [...Array(75).keys()].map(i => i + 1);
 
@@ -12,6 +13,7 @@ function App() {
   const [candidateNumbers, updateCandidateNumbers] = useImmer<number[]>(initialCandidateNumbers)
   const [chosenNumbers, updateChosenNumbers] = useImmer<number[]>([])
   const [currentNumber, updateCurrentNumber] = useState<number>(0)
+  const [isAnimating, setIsAnimating] = useState(false);
 
   function onNextNumberClick(){
     if(candidateNumbers.length === 0){
@@ -32,16 +34,53 @@ function App() {
     updateCandidateNumbers(initialCandidateNumbers)
   }
 
+  // Trigger animation
+  useEffect(() => {
+    setIsAnimating(true);
+    const timeout = setTimeout(() => setIsAnimating(false), 300)
+    return () => clearTimeout(timeout)
+  }, [currentNumber]);
+
+  useEffect(() => {
+    const storedCandidateNumbers = localStorage.getItem("candidateNumbers")
+    const storedChosenNumbers = localStorage.getItem("chosenNumbers")
+    const storedCurrentNumber = localStorage.getItem("currentNumber")
+
+    if (storedCandidateNumbers) {
+      updateCandidateNumbers(JSON.parse(storedCandidateNumbers))
+    }
+    if (storedChosenNumbers) {
+      updateChosenNumbers(JSON.parse(storedChosenNumbers))
+    }
+    if (storedCurrentNumber) {
+      updateCurrentNumber(Number(storedCurrentNumber))
+    }
+  }, [updateCandidateNumbers, updateChosenNumbers, updateCurrentNumber])
+
+  useEffect(() => {
+    const handleUnload = () => {
+      localStorage.setItem("candidateNumbers", JSON.stringify(candidateNumbers))
+      localStorage.setItem("chosenNumbers", JSON.stringify(chosenNumbers))
+      localStorage.setItem("currentNumber", currentNumber.toString())
+    };
+
+    window.addEventListener("beforeunload", handleUnload)
+
+    return () => {
+      window.removeEventListener("beforeunload", handleUnload)
+    }
+  }, [candidateNumbers, chosenNumbers, currentNumber])
+
   return (
     <>
       <header>
           <button 
             className={styles.button}
-            onClick={onNextNumberClick}>次の番号</button>
+            onClick={onNextNumberClick}>次（残り<span>{candidateNumbers.length}</span>）</button>
       </header>
       <div className={styles.numberContainer}>
         <div className={styles.currentNumber}>
-            {currentNumber > 0 && currentNumber}
+            <div className={clsx(isAnimating && styles.fadeIn)}>{currentNumber > 0 && currentNumber}</div>
         </div>
         <div className={styles.chosenNumbers}>
           {chosenNumbers.filter(num => num !== currentNumber).map(num => <div key={num}>{num}</div>)}
