@@ -3,7 +3,8 @@ import styles from './App.module.css'
 import { useImmer } from 'use-immer'
 import clsx from 'clsx';
 
-const initialCandidateNumbers = [...Array(75).keys()].map(i => i + 1);
+const MAX_NUMBER = 75;
+const initialCandidateNumbers = [...Array(MAX_NUMBER).keys()].map(i => i + 1);
 
 function getRandomNumber(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
